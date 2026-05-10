@@ -1,0 +1,292 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ─────────────────────────────────────────── */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-on-surface transition-colors duration-200;
+    min-height: 100vh;
+  }
+
+  /* Dark mode body */
+  .dark body,
+  .dark {
+    background-color: #12131a;
+    color: #e4e4ef;
+  }
+}
+
+/* ─── Material Symbols ─────────────────────────────── */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ─── Scrollbar ────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface-container-low;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-outline-variant rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-outline;
+}
+
+/* ─── Components ───────────────────────────────────── */
+@layer components {
+  /* Sidebar link active state */
+  .nav-link {
+    @apply flex items-center gap-md px-lg py-md rounded-lg text-on-surface-variant
+           hover:text-primary hover:bg-surface-container-low transition-colors duration-150
+           text-label-md cursor-pointer select-none;
+  }
+
+  .nav-link.active {
+    @apply text-primary font-bold bg-surface-container-low border-r-2 border-primary;
+  }
+
+  .dark .nav-link {
+    color: #8e90a2;
+  }
+
+  .dark .nav-link:hover {
+    color: #b2c5ff;
+    background-color: #1e1f2a;
+  }
+
+  .dark .nav-link.active {
+    color: #b2c5ff;
+    background-color: #1e1f2a;
+    border-color: #b2c5ff;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-lg
+           shadow-card flex flex-col justify-between hover:shadow-card-hover transition-shadow duration-200;
+  }
+
+  .dark .stat-card {
+    background-color: #1e1f2a;
+    border-color: #2e3040;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply flex items-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-lg
+           text-label-md shadow-sm hover:opacity-90 active:scale-95
+           transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply flex items-center gap-xs px-lg py-sm border border-outline text-on-surface-variant
+           rounded-lg text-label-md hover:bg-surface-container-low
+           transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply flex items-center gap-xs px-lg py-sm bg-error text-on-error rounded-lg
+           text-label-md hover:opacity-90 active:scale-95
+           transition-all duration-150;
+  }
+
+  /* Input field */
+  .input-field {
+    @apply w-full px-md py-sm bg-surface-container-low border border-outline-variant
+           rounded-lg text-body-sm text-on-surface placeholder:text-outline
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+           transition-all duration-150;
+  }
+
+  .dark .input-field {
+    background-color: #1e1f2a;
+    border-color: #2e3040;
+    color: #e4e4ef;
+  }
+
+  /* Table */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table th {
+    @apply text-left px-md py-sm text-label-sm text-outline uppercase tracking-wider
+           border-b border-outline-variant bg-surface-container-low font-semibold;
+  }
+
+  .data-table td {
+    @apply px-md py-md text-body-sm text-on-surface border-b border-outline-variant
+           transition-colors duration-100;
+  }
+
+  .data-table tr:hover td {
+    @apply bg-surface-container-low;
+  }
+
+  .dark .data-table th {
+    background-color: #191a24;
+    color: #8e90a2;
+    border-color: #2e3040;
+  }
+
+  .dark .data-table td {
+    border-color: #2e3040;
+    color: #c4c6d6;
+  }
+
+  .dark .data-table tr:hover td {
+    background-color: #1e1f2a;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-sm py-xs rounded-full text-label-sm font-medium;
+  }
+
+  .badge-success { @apply bg-green-100 text-green-700; }
+  .badge-warning { @apply bg-yellow-100 text-yellow-700; }
+  .badge-error   { @apply bg-red-100 text-red-700; }
+  .badge-info    { @apply bg-secondary-container text-on-secondary-container; }
+  .badge-primary { @apply bg-primary-fixed text-on-primary-fixed; }
+
+  .dark .badge-success { @apply bg-green-900/40 text-green-400; }
+  .dark .badge-warning { @apply bg-yellow-900/40 text-yellow-400; }
+  .dark .badge-error   { @apply bg-red-900/40 text-red-400; }
+
+  /* Card */
+  .card {
+    @apply bg-surface-container-lowest border border-outline-variant rounded-xl
+           shadow-card p-lg;
+  }
+
+  .dark .card {
+    background-color: #1e1f2a;
+    border-color: #2e3040;
+  }
+
+  /* Page container */
+  .page-container {
+    @apply max-w-[1200px] mx-auto p-lg animate-fadeIn;
+  }
+
+  /* Page header */
+  .page-header {
+    @apply mb-xl;
+  }
+
+  .page-title {
+    @apply text-headline-lg text-primary mb-xs;
+  }
+
+  .dark .page-title {
+    color: #b2c5ff;
+  }
+
+  .page-subtitle {
+    @apply text-body-md text-on-surface-variant;
+  }
+
+  /* Search bar */
+  .search-bar {
+    @apply relative w-full max-w-md;
+  }
+
+  .search-bar input {
+    @apply w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant
+           rounded-full text-body-sm focus:ring-2 focus:ring-primary focus:border-transparent
+           transition-all duration-150;
+  }
+
+  .dark .search-bar input {
+    background-color: #1e1f2a;
+    border-color: #2e3040;
+    color: #e4e4ef;
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center
+           animate-fadeIn;
+  }
+
+  .modal-content {
+    @apply bg-surface-container-lowest border border-outline-variant rounded-xl shadow-card-hover
+           p-xl w-full max-w-lg mx-md animate-fadeIn;
+  }
+
+  .dark .modal-content {
+    background-color: #1e1f2a;
+    border-color: #2e3040;
+  }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-low
+           bg-[length:200%_100%] animate-shimmer rounded-lg;
+  }
+}
+
+/* ─── Recharts overrides ───────────────────────────── */
+.recharts-cartesian-grid line {
+  stroke: #c3c6d6;
+  stroke-opacity: 0.5;
+}
+
+.dark .recharts-cartesian-grid line {
+  stroke: #2e3040;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  border-radius: 8px !important;
+  border: 1px solid #c3c6d6 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* ─── Transitions ──────────────────────────────────── */
+.page-enter {
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* ─── Print ────────────────────────────────────────── */
+@media print {
+  aside, header { display: none !important; }
+  main { margin-left: 0 !important; }
+}
