@@ -12,8 +12,9 @@ export default function Contact() {
   const [selectedContact, setSelectedContact] = useState(null);
 
   useEffect(() => {
+    if (!token) return;
     fetchContacts();
-  }, []);
+  }, [token]);
 
   const fetchContacts = async () => {
     setLoading(true);

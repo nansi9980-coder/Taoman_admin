@@ -43,8 +43,9 @@ export default function Calendar() {
   };
 
   useEffect(() => {
+    if (!token) return;
     loadEvents();
-  }, []);
+  }, [token]);
 
   const getDaysInMonth = (date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   const getFirstDayOfMonth = (date) => {

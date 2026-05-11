@@ -48,12 +48,13 @@ export default function Backup() {
   const [selectedBackup, setSelectedBackup] = useState(null);
 
   useEffect(() => {
+    if (!token) return;
     fetchBackups().then((data) => {
       if (Array.isArray(data) && data.length) {
         setBackups(data.map(mapBackup));
       }
     });
-  }, [fetchBackups]);
+  }, [token, fetchBackups]);
 
   const totalBackupSize = backups.reduce((sum, b) => sum + (typeof b.size === "number" ? b.size : parseFloat(b.size) || 0), 0);
   const successCount = backups.filter((b) => b.status === "success" || b.status === "Complété").length;
