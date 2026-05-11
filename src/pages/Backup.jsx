@@ -9,52 +9,63 @@ const BACKUP_SCHEDULE = {
   incremental: { day: "Tous les jours", time: "03:00", frequency: "Quotidienne" },
 };
 
+const statusConfig = {
+  success: { label: "Succès", icon: "check_circle", color: "bg-secondary" },
+  Complété: { label: "Complété", icon: "check_circle", color: "bg-secondary" },
+  error: { label: "Échec", icon: "error", color: "bg-error" },
+  running: { label: "En cours", icon: "autorenew", color: "bg-primary" },
+};
+
+function normalizeStatus(status) {
+  if (!status) return "success";
+  if (statusConfig[status]) return status;
+  const lower = status.toLowerCase();
+  if (lower.includes("complet") || lower.includes("success")) return "success";
+  if (lower.includes("err") || lower.includes("fail") || lower.includes("refus")) return "error";
+  if (lower.includes("cours") || lower.includes("running")) return "running";
+  return "success";
+}
+
+function mapBackup(backup) {
+  return {
+    id: backup.id ?? backup._id,
+    name: backup.name || backup.title || "Sauvegarde",
+    size: typeof backup.size === "number" ? backup.size : parseFloat(backup.size) || 0,
+    type: backup.type || "complete",
+    date: backup.date || backup.createdAt?.split("T")[0] || new Date().toISOString().split("T")[0],
+    time: backup.time || backup.createdAt?.split("T")[1]?.split(".")[0] || new Date().toLocaleTimeString("fr-FR"),
+    status: normalizeStatus(backup.status),
+    duration: backup.duration || "—",
+  };
+}
+
 export default function Backup() {
   const { fetchBackups } = useApp();
   const { token } = useAuth();
   const [backups, setBackups] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showScheduleEditor, setShowScheduleEditor] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState(null);
 
   useEffect(() => {
     fetchBackups().then((data) => {
       if (Array.isArray(data) && data.length) {
-        setBackups(data.map((backup) => ({
-          id: backup.id ?? backup._id,
-          name: backup.name || backup.title || "Sauvegarde",
-          size: typeof backup.size === "number" ? backup.size : parseFloat(backup.size) || 0,
-          type: backup.type || "complete",
-          date: backup.date || backup.createdAt || new Date().toISOString().split("T")[0],
-          time: backup.time || backup.createdAt?.split("T")[1]?.split(".")[0] || new Date().toLocaleTimeString("fr-FR"),
-          status: backup.status || "success",
-          duration: backup.duration || "—",
-        })));
+        setBackups(data.map(mapBackup));
       }
     });
   }, [fetchBackups]);
 
   const totalBackupSize = backups.reduce((sum, b) => sum + (typeof b.size === "number" ? b.size : parseFloat(b.size) || 0), 0);
-  const successCount = backups.filter((b) => b.status === "success").length;
+  const successCount = backups.filter((b) => b.status === "success" || b.status === "Complété").length;
 
   const handleBackupNow = async () => {
     setIsRunning(true);
     try {
       await apiFetch("/backups", { method: "POST", token });
-      // Refresh the list
-      fetchBackups().then((data) => {
-        if (Array.isArray(data) && data.length) {
-          setBackups(data.map((backup) => ({
-            id: backup.id ?? backup._id,
-            name: backup.name || backup.title || "Sauvegarde",
-            size: typeof backup.size === "number" ? backup.size : parseFloat(backup.size) || 0,
-            type: backup.type || "complete",
-            date: backup.date || backup.createdAt || new Date().toISOString().split("T")[0],
-            time: backup.time || backup.createdAt?.split("T")[1]?.split(".")[0] || new Date().toLocaleTimeString("fr-FR"),
-            status: backup.status || "success",
-            duration: backup.duration || "—",
-          })));
-        }
-      });
+      const data = await fetchBackups();
+      if (Array.isArray(data) && data.length) {
+        setBackups(data.map(mapBackup));
+      }
     } catch (err) {
       alert("Erreur lors de la sauvegarde: " + err.message);
     } finally {
@@ -68,9 +79,14 @@ export default function Backup() {
     }
   };
 
-  const handleDelete = (backup) => {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer ${backup.name}?`)) {
+  const handleDelete = async (backup) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${backup.name}?`)) return;
+    try {
+      await apiFetch(`/backups/${backup.id}`, { method: "DELETE", token });
       setBackups((prev) => prev.filter((b) => b.id !== backup.id));
+      if (selectedBackup?.id === backup.id) setSelectedBackup(null);
+    } catch (err) {
+      alert("Erreur suppression: " + err.message);
     }
   };
 
@@ -121,7 +137,7 @@ export default function Backup() {
         <div className="p-md rounded-lg bg-surface-container-low dark:bg-[#1e1f2a] border border-outline-variant">
           <p className="text-label-sm text-on-surface-variant dark:text-[#8e90a2]">Taille Totale</p>
           <p className="text-headline-md text-on-surface dark:text-[#e4e4ef] font-bold mt-xs">
-            {totalBackupSize.toFixed(1)} GB
+            {totalBackupSize.toFixed(1)} MB
           </p>
         </div>
       </div>
@@ -181,75 +197,78 @@ export default function Backup() {
         </div>
 
         <div className="divide-y divide-outline-variant max-h-96 overflow-y-auto">
-          {backups.map((backup) => (
-            <div
-              key={backup.id}
-              className={clsx(
-                "p-md hover:bg-surface-container-low dark:hover:bg-[#282a36] transition-colors duration-150 cursor-pointer",
-                selectedBackup?.id === backup.id ? "bg-primary-fixed dark:bg-[#001848]/30" : ""
-              )}
-              onClick={() => setSelectedBackup(backup)}
-            >
-              <div className="flex items-start justify-between gap-md">
-                <div className="flex-1">
-                  <div className="flex items-center gap-sm mb-xs">
-                    <span className={clsx(
-                      "material-symbols-outlined text-white p-xs rounded text-[18px]",
-                      statusConfig[backup.status].color
-                    )}>
-                      {statusConfig[backup.status].icon}
-                    </span>
-                    <h3 className="text-body-md font-semibold text-on-surface dark:text-[#e4e4ef]">
-                      {backup.name}
-                    </h3>
-                    <span className="text-label-sm px-sm py-xs rounded-full bg-surface-container-low dark:bg-[#282a36] text-on-surface-variant dark:text-[#8e90a2]">
-                      {backup.type === "complete" ? "Complète" : "Incrémentale"}
-                    </span>
+          {backups.length === 0 && (
+            <div className="p-lg text-center text-on-surface-variant dark:text-[#8e90a2]">
+              Aucune sauvegarde disponible.
+            </div>
+          )}
+          {backups.map((backup) => {
+            const cfg = statusConfig[backup.status] || statusConfig.success;
+            return (
+              <div
+                key={backup.id}
+                className={clsx(
+                  "p-md hover:bg-surface-container-low dark:hover:bg-[#282a36] transition-colors duration-150 cursor-pointer",
+                  selectedBackup?.id === backup.id ? "bg-primary-fixed dark:bg-[#001848]/30" : ""
+                )}
+                onClick={() => setSelectedBackup(backup)}
+              >
+                <div className="flex items-start justify-between gap-md">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-sm mb-xs">
+                      <span className={clsx(
+                        "material-symbols-outlined text-white p-xs rounded text-[18px]",
+                        cfg.color
+                      )}>
+                        {cfg.icon}
+                      </span>
+                      <h3 className="text-body-md font-semibold text-on-surface dark:text-[#e4e4ef]">
+                        {backup.name}
+                      </h3>
+                      <span className="text-label-sm px-sm py-xs rounded-full bg-surface-container-low dark:bg-[#282a36] text-on-surface-variant dark:text-[#8e90a2]">
+                        {backup.type === "complete" ? "Complète" : "Incrémentale"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-md flex-wrap text-label-sm text-on-surface-variant dark:text-[#8e90a2]">
+                      <span>📅 {backup.date} {backup.time}</span>
+                      <span>💾 {backup.size.toFixed ? backup.size.toFixed(1) : backup.size} MB</span>
+                      <span>⏱️ {backup.duration}</span>
+                      <span className={clsx(
+                        "font-semibold",
+                        cfg.color === "bg-secondary" ? "text-secondary"
+                          : cfg.color === "bg-error" ? "text-error"
+                          : "text-primary"
+                      )}>
+                        {cfg.label}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-md flex-wrap text-label-sm text-on-surface-variant dark:text-[#8e90a2]">
-                    <span>📅 {backup.date} {backup.time}</span>
-                    <span>💾 {backup.size.toFixed(1)} GB</span>
-                    <span>⏱️ {backup.duration}</span>
-                    <span className={clsx(
-                      "font-semibold",
-                      statusConfig[backup.status].color === "bg-secondary"
-                        ? "text-secondary"
-                        : statusConfig[backup.status].color === "bg-error"
-                        ? "text-error"
-                        : "text-primary"
-                    )}>
-                      {statusConfig[backup.status].label}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex gap-sm">
-                  <button
-                    onClick={() => handleRestore(backup)}
-                    disabled={backup.status !== "success"}
-                    className={clsx(
-                      "px-md py-sm rounded-lg font-label-md transition-colors duration-150",
-                      backup.status === "success"
-                        ? "bg-secondary text-white hover:bg-secondary-container dark:bg-[#abcae8] dark:text-secondary dark:hover:bg-[#c1e0ff]"
-                        : "bg-surface-container-high dark:bg-[#282a36] text-on-surface-variant dark:text-[#8e90a2] opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    Restaurer
-                  </button>
-                  <button
-                    onClick={() => handleDelete(backup)}
-                    className={clsx(
-                      "px-md py-sm rounded-lg font-label-md transition-colors duration-150",
-                      "bg-error/20 text-error hover:bg-error/30"
-                    )}
-                  >
-                    Supprimer
-                  </button>
+                  {/* Actions */}
+                  <div className="flex gap-sm" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => handleRestore(backup)}
+                      disabled={backup.status !== "success" && backup.status !== "Complété"}
+                      className={clsx(
+                        "px-md py-sm rounded-lg font-label-md transition-colors duration-150",
+                        (backup.status === "success" || backup.status === "Complété")
+                          ? "bg-secondary text-white hover:bg-secondary-container dark:bg-[#abcae8] dark:text-secondary dark:hover:bg-[#c1e0ff]"
+                          : "bg-surface-container-high dark:bg-[#282a36] text-on-surface-variant dark:text-[#8e90a2] opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      Restaurer
+                    </button>
+                    <button
+                      onClick={() => handleDelete(backup)}
+                      className="px-md py-sm rounded-lg font-label-md transition-colors duration-150 bg-error/20 text-error hover:bg-error/30"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -275,7 +294,7 @@ export default function Backup() {
             <div>
               <p className="text-label-sm text-on-surface-variant dark:text-[#8e90a2]">Taille</p>
               <p className="text-body-sm font-semibold text-on-surface dark:text-[#e4e4ef] mt-xs">
-                {selectedBackup.size.toFixed(1)} GB
+                {selectedBackup.size.toFixed ? selectedBackup.size.toFixed(1) : selectedBackup.size} MB
               </p>
             </div>
             <div>
