@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { useApp } from "../context/AppContext";
+import { apiFetch } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
 
 const BACKUPS = [
   { id: 1, name: "Sauvegarde Complète 2026-05-09", size: 5.2, type: "complete", date: "2026-05-09", time: "23:00", status: "success", duration: "45 min" },
@@ -50,21 +52,28 @@ export default function Backup() {
 
   const handleBackupNow = async () => {
     setIsRunning(true);
-    // Simulate backup
-    await new Promise((r) => setTimeout(r, 2000));
-    setIsRunning(false);
-    // Add new backup
-    const newBackup = {
-      id: Math.max(...backups.map((b) => b.id)) + 1,
-      name: `Sauvegarde Manuelle ${new Date().toISOString().split("T")[0]}`,
-      size: Math.random() * 5,
-      type: "complete",
-      date: new Date().toISOString().split("T")[0],
-      time: new Date().toLocaleTimeString("fr-FR"),
-      status: "success",
-      duration: "42 min",
-    };
-    setBackups((prev) => [newBackup, ...prev]);
+    try {
+      await apiFetch("/backups", { method: "POST", token });
+      // Refresh the list
+      fetchBackups().then((data) => {
+        if (Array.isArray(data) && data.length) {
+          setBackups(data.map((backup) => ({
+            id: backup.id ?? backup._id,
+            name: backup.name || backup.title || "Sauvegarde",
+            size: typeof backup.size === "number" ? backup.size : parseFloat(backup.size) || 0,
+            type: backup.type || "complete",
+            date: backup.date || backup.createdAt || new Date().toISOString().split("T")[0],
+            time: backup.time || backup.createdAt?.split("T")[1]?.split(".")[0] || new Date().toLocaleTimeString("fr-FR"),
+            status: backup.status || "success",
+            duration: backup.duration || "—",
+          })));
+        }
+      });
+    } catch (err) {
+      alert("Erreur lors de la sauvegarde: " + err.message);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleRestore = (backup) => {

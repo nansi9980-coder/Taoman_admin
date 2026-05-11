@@ -137,7 +137,14 @@ export function AppProvider({ children }) {
       setUnreadCount(list.filter((n) => !n.read).length);
       return list;
     } catch (err) {
-      setError(err.message);
+      const message = err.message || "Erreur API";
+      if (message.toLowerCase().includes("not found") || message.includes("404")) {
+        // Backend does not expose a notifications list yet. Keep the UI usable.
+        setNotifications([]);
+        setUnreadCount(0);
+        return [];
+      }
+      setError(message);
       return [];
     } finally {
       setLoading(false);

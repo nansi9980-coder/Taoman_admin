@@ -120,7 +120,7 @@ export default function Statistiques() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-        {KPI_CARDS.map((kpi, idx) => (
+        {cards.map((kpi, idx) => (
           <div
             key={idx}
             className={clsx(

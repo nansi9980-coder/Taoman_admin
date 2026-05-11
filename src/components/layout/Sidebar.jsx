@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { to: "/contenu", icon: "edit_note", label: "Contenu du site", permission: "content" },
   { to: "/medias", icon: "perm_media", label: "Médiathèque", permission: "content" },
   { to: "/jobs", icon: "work", label: "Emplois", permission: null },
-  { to: "/messages", icon: "chat", label: "Messages", permission: null },
+  { to: "/messages", icon: "chat", label: "Contact", permission: null },
   { to: "/calendar", icon: "calendar_month", label: "Calendrier", permission: null },
   { to: "/investments", icon: "trending_up", label: "Investissements", permission: null },
   { to: "/backup", icon: "backup", label: "Sauvegarde", permission: null },

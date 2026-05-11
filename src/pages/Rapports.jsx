@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { useApp } from "../context/AppContext";
+import { apiFetch } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
 
 const REPORTS_DATA = [
   { id: 1, name: "Rapport Financier Q1 2026", type: "financier", date: "2026-04-30", size: "2.4 MB", status: "disponible", format: "PDF" },
