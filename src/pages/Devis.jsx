@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import clsx from "clsx";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
+import { buildUrl } from "../utils/api";
 
 // ── Constants ─────────────────────────────────────────────────────
 const STATUS_META = {
@@ -227,13 +228,14 @@ export default function Devis() {
   const handleGeneratePdf = async (id) => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:3000/quotes/${id}/generate-pdf`, {
+      const res = await fetch(buildUrl(`/quotes/${id}/generate-pdf`), {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
-        window.open(`http://localhost:3000${data.url}`, '_blank');
+        const pdfUrl = data.url?.startsWith("http") ? data.url : buildUrl(data.url);
+        window.open(pdfUrl, '_blank');
         updateDevis(id, { status: "Envoyé", pdfUrl: data.url });
       }
     } catch (e) {

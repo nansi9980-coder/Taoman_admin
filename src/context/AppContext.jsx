@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { apiFetch } from "../utils/api";
+import { apiFetch, API_BASE, buildUrl } from "../utils/api";
 import { io } from "socket.io-client";
 
 /**
@@ -78,7 +78,7 @@ export function AppProvider({ children }) {
   // WebSocket integration
   useEffect(() => {
     if (!token) return;
-    const socket = io("http://localhost:3000");
+    const socket = io(API_BASE, { transports: ["websocket"], auth: { token } });
     
     socket.on("newLog", (log) => {
       setLogs((prev) => [log, ...prev]);
@@ -308,12 +308,12 @@ export function AppProvider({ children }) {
       formData.append('file', file);
       formData.append('category', category);
       
-      const response = await fetch('http://localhost:3000/media/upload', {
+      const response = await fetch(buildUrl('/media/upload'), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
       
       if (!response.ok) throw new Error("Erreur lors de l'upload");

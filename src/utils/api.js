@@ -1,6 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+export const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-function buildUrl(path) {
+export function buildUrl(path) {
   return `${API_BASE}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 

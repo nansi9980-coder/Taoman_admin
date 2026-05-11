@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
-import { apiFetch } from "../utils/api";
+import { apiFetch, buildUrl } from "../utils/api";
 import clsx from "clsx";
 
 export default function Medias() {
@@ -119,7 +119,7 @@ export default function Medias() {
                     </span>
                   </div>
                   <div>
-                    <a href={`http://localhost:3000${item.url}`} target="_blank" rel="noreferrer" className="text-body-md font-semibold text-primary hover:underline">{item.name}</a>
+                    <a href={item.url?.startsWith("http") ? item.url : buildUrl(item.url)} target="_blank" rel="noreferrer" className="text-body-md font-semibold text-primary hover:underline">{item.name}</a>
                     <div className="flex items-center gap-sm mt-xs">
                       <span className="text-label-sm px-2 py-0.5 rounded bg-secondary-container text-secondary">{item.category}</span>
                       <span className="text-label-sm text-on-surface-variant dark:text-[#8e90a2]">{item.type}</span>

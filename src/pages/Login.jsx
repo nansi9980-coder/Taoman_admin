@@ -91,7 +91,7 @@ export default function Login() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                placeholder="admin@taoman-groupe.com"
+                placeholder="admin@taoman.com"
                 autoComplete="email"
                 className="input-field pl-10"
               />
@@ -170,15 +170,15 @@ export default function Login() {
           <p className="text-label-sm text-outline text-center mb-sm">Accès démo</p>
           <div className="bg-surface-container-low dark:bg-[#191a24] rounded-lg p-sm text-center">
             <p className="text-label-sm text-on-surface-variant dark:text-[#8e90a2] font-mono">
-              admin@taoman-groupe.com
+              admin@taoman.com
             </p>
             <p className="text-label-sm text-on-surface-variant dark:text-[#8e90a2] font-mono">
-              admin123
+              admin
             </p>
           </div>
           <button
             type="button"
-            onClick={() => setForm({ email: "admin@taoman-groupe.com", password: "admin123" })}
+            onClick={() => setForm({ email: "admin@taoman.com", password: "admin" })}
             className="w-full mt-sm text-label-sm text-primary dark:text-[#b2c5ff] hover:underline"
           >
             Remplir automatiquement

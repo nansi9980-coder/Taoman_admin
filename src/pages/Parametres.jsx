@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
+import { buildUrl } from "../utils/api";
 
 export default function Parametres() {
   const { mode, setTheme, activePalette, fetchActiveTheme } = useTheme();
   const [themes, setThemes] = useState([]);
   
   useEffect(() => {
-    fetch("http://localhost:3000/theme")
-      .then(res => res.json())
+    fetch(buildUrl("/theme"))
+      .then((res) => res.json())
       .then(setThemes)
       .catch(console.error);
   }, []);
 
   const handleSetTheme = async (id) => {
     try {
-      await fetch(`http://localhost:3000/theme/active/${id}`, { method: "PUT" });
+      await fetch(buildUrl(`/theme/active/${id}`), { method: "PUT" });
       await fetchActiveTheme();
     } catch (e) {
       console.error(e);
@@ -23,11 +24,11 @@ export default function Parametres() {
 
   const handleInitThemes = async () => {
     try {
-      await fetch(`http://localhost:3000/theme/init`, { method: "POST" });
-      const res = await fetch("http://localhost:3000/theme");
+      await fetch(buildUrl("/theme/init"), { method: "POST" });
+      const res = await fetch(buildUrl("/theme"));
       setThemes(await res.json());
       await fetchActiveTheme();
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
   };

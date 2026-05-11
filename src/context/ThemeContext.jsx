@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { buildUrl } from "../utils/api";
 
 // Modes: "light" | "dark" | "system"
 const ThemeContext = createContext(null);
@@ -38,7 +39,7 @@ export function ThemeProvider({ children }) {
 
   const fetchActiveTheme = async () => {
     try {
-      const res = await fetch("http://localhost:3000/theme/active");
+      const res = await fetch(buildUrl("/theme/active"));
       const theme = await res.json();
       if (theme) {
         setActivePalette(theme);
