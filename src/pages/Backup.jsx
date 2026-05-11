@@ -4,10 +4,15 @@ import { useApp } from "../context/AppContext";
 import { apiFetch } from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
+const BACKUP_SCHEDULE = {
+  full: { day: "Dimanche", time: "02:00", frequency: "Hebdomadaire" },
+  incremental: { day: "Tous les jours", time: "03:00", frequency: "Quotidienne" },
+};
+
 export default function Backup() {
   const { fetchBackups } = useApp();
+  const { token } = useAuth();
   const [backups, setBackups] = useState([]);
-  const [selectedBackup, setSelectedBackup] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [showScheduleEditor, setShowScheduleEditor] = useState(false);
 

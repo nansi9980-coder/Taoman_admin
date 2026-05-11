@@ -240,6 +240,10 @@ export default function Clients() {
     return list;
   }, [clients, search, filterStatus, filterService, sort]);
 
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paged = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
   const handleExportCSV = () => {
     const csvData = clients.map(client => ({
       'Nom': client.name,
