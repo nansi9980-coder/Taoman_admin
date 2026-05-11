@@ -4,28 +4,9 @@ import { useApp } from "../context/AppContext";
 import { apiFetch } from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
-const BACKUPS = [
-  { id: 1, name: "Sauvegarde Complète 2026-05-09", size: 5.2, type: "complete", date: "2026-05-09", time: "23:00", status: "success", duration: "45 min" },
-  { id: 2, name: "Sauvegarde Incrémentale 2026-05-08", size: 0.8, type: "incremental", date: "2026-05-08", time: "23:00", status: "success", duration: "8 min" },
-  { id: 3, name: "Sauvegarde Incrémentale 2026-05-07", size: 0.6, type: "incremental", date: "2026-05-07", time: "23:00", status: "success", duration: "6 min" },
-  { id: 4, name: "Sauvegarde Complète 2026-05-02", size: 5.1, type: "complete", date: "2026-05-02", time: "23:00", status: "success", duration: "44 min" },
-  { id: 5, name: "Sauvegarde Complète 2026-04-25", size: 4.9, type: "complete", date: "2026-04-25", time: "23:00", status: "failed", duration: "N/A" },
-];
-
-const BACKUP_SCHEDULE = {
-  full: { day: "Vendredi", time: "23:00", frequency: "Hebdomadaire" },
-  incremental: { day: "Quotidien", time: "23:00", frequency: "Tous les jours" },
-};
-
-const statusConfig = {
-  success: { label: "Succès", color: "bg-secondary", icon: "check_circle" },
-  failed: { label: "Échoué", color: "bg-error", icon: "error" },
-  running: { label: "En cours", color: "bg-primary", icon: "hourglass_bottom" },
-};
-
 export default function Backup() {
   const { fetchBackups } = useApp();
-  const [backups, setBackups] = useState(BACKUPS);
+  const [backups, setBackups] = useState([]);
   const [selectedBackup, setSelectedBackup] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [showScheduleEditor, setShowScheduleEditor] = useState(false);

@@ -43,11 +43,11 @@ export default function Contenu() {
     setLoading(true);
     try {
       if (tab === "services") {
-        const data = await apiFetch("/content/services", { token });
-        setServices(data || []);
+        const data = await apiFetch("/content", { token });
+        setServices(Array.isArray(data) ? data.filter(item => item.type === 'service') : []);
       } else {
-        const data = await apiFetch("/content/texts", { token });
-        setTexts(data || []);
+        const data = await apiFetch("/content", { token });
+        setTexts(Array.isArray(data) ? data.filter(item => item.type === 'text') : []);
       }
     } catch (e) {
       console.error(e);
@@ -80,9 +80,9 @@ export default function Contenu() {
     e.preventDefault();
     try {
       if (editingItem) {
-        await apiFetch(`/content/services/${editingItem.id}`, { method: "PUT", body: serviceForm, token });
+        await apiFetch(`/content/${editingItem.id}`, { method: "PUT", body: serviceForm, token });
       } else {
-        await apiFetch("/content/services", { method: "POST", body: serviceForm, token });
+        await apiFetch("/content", { method: "POST", body: { ...serviceForm, type: 'service' }, token });
       }
       setModalOpen(false);
       loadData();
@@ -93,7 +93,7 @@ export default function Contenu() {
     e.stopPropagation();
     if (!window.confirm("Supprimer ce service ?")) return;
     try {
-      await apiFetch(`/content/services/${id}`, { method: "DELETE", token });
+      await apiFetch(`/content/${id}`, { method: "DELETE", token });
       loadData();
     } catch(e) { alert(e.message); }
   };

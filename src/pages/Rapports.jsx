@@ -9,9 +9,9 @@ export default function Rapports() {
   const generateReport = async (type) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/reports/generate/${type}`, {
+      const response = await apiFetch(`/reports/generate/${type}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        token
       });
 
       if (!response.ok) throw new Error('Erreur génération');

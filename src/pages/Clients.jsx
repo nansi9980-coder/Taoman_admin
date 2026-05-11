@@ -240,8 +240,32 @@ export default function Clients() {
     return list;
   }, [clients, search, filterStatus, filterService, sort]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const handleExportCSV = () => {
+    const csvData = clients.map(client => ({
+      'Nom': client.name,
+      'Email': client.email,
+      'Téléphone': client.phone || '',
+      'Service': client.service,
+      'Statut': client.status,
+      'Inscrit le': client.joined,
+      'Dossiers': client.dossiers
+    }));
+
+    const csvContent = [
+      Object.keys(csvData[0]).join(','),
+      ...csvData.map(row => Object.values(row).map(val => `"${val}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `clients-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // ── CRUD ─────────────────────────────────────────────────────
   const handleSave = (form) => {
@@ -303,7 +327,7 @@ export default function Clients() {
           <p className="page-subtitle">Gérez les comptes clients et leurs accès à la plateforme.</p>
         </div>
         <div className="flex gap-sm">
-          <button className="btn-secondary gap-xs">
+          <button onClick={handleExportCSV} className="btn-secondary gap-xs">
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             Exporter CSV
           </button>

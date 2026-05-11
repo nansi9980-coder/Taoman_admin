@@ -190,10 +190,41 @@ export default function Devis() {
 
   const [detailDevis, setDetailDevis] = useState(null);
   const [emailDevis, setEmailDevis] = useState(null);   // { devis, response }
+  const [newDevisModal, setNewDevisModal] = useState(false);
+  const [newDevisForm, setNewDevisForm] = useState({
+    client: '', email: '', service: '', priority: 'normale', desc: ''
+  });
 
   useEffect(() => {
     fetchDevis();
   }, [fetchDevis]);
+
+  const handleOpenNew = () => {
+    setNewDevisForm({ client: '', email: '', service: '', priority: 'normale', desc: '' });
+    setNewDevisModal(true);
+  };
+
+  const handleCreateDevis = async () => {
+    if (!newDevisForm.client || !newDevisForm.email || !newDevisForm.service) return;
+    try {
+      await apiFetch("/quotes", {
+        method: "POST",
+        token,
+        body: {
+          title: `Devis ${newDevisForm.service}`,
+          description: newDevisForm.desc,
+          service: newDevisForm.service,
+          status: "En attente",
+          priority: newDevisForm.priority,
+          client: { name: newDevisForm.client, email: newDevisForm.email }
+        }
+      });
+      setNewDevisModal(false);
+      fetchDevis();
+    } catch (err) {
+      alert("Erreur création devis: " + err.message);
+    }
+  };
 
   // ── Derived list ──────────────────────────────────────────────
   const filtered = useMemo(() => devis.filter((d) => {
@@ -259,7 +290,7 @@ export default function Devis() {
           <h2 className="page-title">Gestion des Devis</h2>
           <p className="page-subtitle">Consultez les demandes, répondez et envoyez les devis par email.</p>
         </div>
-        <button className="btn-primary gap-xs w-fit">
+        <button onClick={handleOpenNew} className="btn-primary gap-xs w-fit">
           <span className="material-symbols-outlined text-[18px]">add</span>
           Nouveau devis
         </button>
@@ -398,11 +429,80 @@ export default function Devis() {
       <Modal open={!!emailDevis} onClose={() => setEmailDevis(null)} title="Envoyer le devis par email" size="lg">
         {emailDevis && (
           <EmailPanel
-            devis={{ ...emailDevis.devis, response: emailDevis.response }}
+            devis={{ ...emailDevis.devis, response: emailDevis.devis.response }}
             onSent={handleSent}
             onClose={() => setEmailDevis(null)}
           />
         )}
+      </Modal>
+
+      {/* Nouveau devis modal */}
+      <Modal open={newDevisModal} onClose={() => setNewDevisModal(false)} title="Créer un nouveau devis">
+        <div className="space-y-md">
+          <div>
+            <label className="block text-label-md text-on-surface-variant dark:text-[#8e90a2] mb-xs">Nom du client *</label>
+            <input
+              type="text"
+              value={newDevisForm.client}
+              onChange={(e) => setNewDevisForm(p => ({ ...p, client: e.target.value }))}
+              className="input-field"
+              placeholder="Prénom Nom"
+            />
+          </div>
+          <div>
+            <label className="block text-label-md text-on-surface-variant dark:text-[#8e90a2] mb-xs">Email du client *</label>
+            <input
+              type="email"
+              value={newDevisForm.email}
+              onChange={(e) => setNewDevisForm(p => ({ ...p, email: e.target.value }))}
+              className="input-field"
+              placeholder="client@email.com"
+            />
+          </div>
+          <div>
+            <label className="block text-label-md text-on-surface-variant dark:text-[#8e90a2] mb-xs">Service *</label>
+            <select
+              value={newDevisForm.service}
+              onChange={(e) => setNewDevisForm(p => ({ ...p, service: e.target.value }))}
+              className="input-field"
+            >
+              <option value="">Sélectionner un service</option>
+              <option value="Investissement">Investissement</option>
+              <option value="Gestion Patrimoine">Gestion Patrimoine</option>
+              <option value="Services Entretien">Services Entretien</option>
+              <option value="Contact">Contact</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-label-md text-on-surface-variant dark:text-[#8e90a2] mb-xs">Priorité</label>
+            <select
+              value={newDevisForm.priority}
+              onChange={(e) => setNewDevisForm(p => ({ ...p, priority: e.target.value }))}
+              className="input-field"
+            >
+              <option value="basse">Basse</option>
+              <option value="normale">Normale</option>
+              <option value="haute">Haute</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-label-md text-on-surface-variant dark:text-[#8e90a2] mb-xs">Description</label>
+            <textarea
+              value={newDevisForm.desc}
+              onChange={(e) => setNewDevisForm(p => ({ ...p, desc: e.target.value }))}
+              rows={4}
+              className="input-field resize-none"
+              placeholder="Décrivez la demande du client..."
+            />
+          </div>
+          <div className="flex justify-end gap-sm pt-sm border-t border-outline-variant dark:border-[#2e3040]">
+            <button onClick={() => setNewDevisModal(false)} className="btn-secondary">Annuler</button>
+            <button onClick={handleCreateDevis} className="btn-primary gap-xs">
+              <span className="material-symbols-outlined text-[18px]">add</span>
+              Créer le devis
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

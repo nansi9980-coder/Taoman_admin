@@ -37,10 +37,10 @@ const REVENUE_DATA = [
 ];
 
 const KPI_CARDS = [
-  { label: "Total Clients", value: "1,234", change: "+5.2%", icon: "group", color: "text-primary" },
-  { label: "Devis Ce Mois", value: "89", change: "+12.5%", icon: "description", color: "text-secondary" },
-  { label: "Revenus Total", value: "145.2M XOF", change: "+8.3%", icon: "attach_money", color: "text-tertiary" },
-  { label: "Taux Conversion", value: "64.2%", change: "+3.1%", icon: "trending_up", color: "text-primary" },
+  { label: "Total Clients", value: "...", change: "", icon: "group", color: "text-primary" },
+  { label: "Devis Ce Mois", value: "...", change: "", icon: "description", color: "text-secondary" },
+  { label: "Revenus Total", value: "...", change: "", icon: "attach_money", color: "text-tertiary" },
+  { label: "Taux Conversion", value: "...", change: "", icon: "trending_up", color: "text-primary" },
 ];
 
 export default function Statistiques() {
@@ -78,6 +78,10 @@ export default function Statistiques() {
 
   const cards = [
     { label: "Total Clients", value: stats.clients ?? "...", change: "", icon: "group", color: "text-primary" },
+    { label: "Devis Ce Mois", value: stats.quotes ?? "...", change: "", icon: "description", color: "text-secondary" },
+    { label: "Revenus Total", value: stats.revenue ?? "...", change: "", icon: "attach_money", color: "text-tertiary" },
+    { label: "Taux Conversion", value: stats.conversion ?? "...", change: "", icon: "trending_up", color: "text-primary" },
+  ];
     { label: "Devis Ce Mois", value: stats.pendingQuotes ?? "...", change: "", icon: "description", color: "text-secondary" },
     { label: "Devis Acceptés", value: stats.acceptedQuotes ?? "...", change: "", icon: "check_circle", color: "text-success" },
     { label: "Taux Conversion", value: stats.conversionRate ? `${stats.conversionRate}%` : "...", change: "", icon: "trending_up", color: "text-primary" },
