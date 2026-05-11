@@ -37,6 +37,7 @@ export default function Contenu() {
   const [texts, setTexts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("section");
   const [editingItem, setEditingItem] = useState(null);
   const [selectedSection, setSelectedSection] = useState("hero");
 
@@ -74,12 +75,16 @@ export default function Contenu() {
   }, [token]);
 
   const openNewService = () => {
+    setModalType("service");
+    setSelectedSection(null);
     setEditingItem(null);
     setServiceForm({ title: "", description: "", icon: "", actionText: "", actionLink: "", published: true });
     setModalOpen(true);
   };
 
   const openEditService = (srv) => {
+    setModalType("service");
+    setSelectedSection(null);
     setEditingItem(srv);
     setServiceForm({
       title: srv.title || "",
@@ -130,6 +135,7 @@ export default function Contenu() {
 
   const openSectionEditor = (key) => {
     const section = texts.find((item) => item.section === key) || null;
+    setModalType("section");
     setSelectedSection(key);
     setEditingItem(section);
     setTextForm({ section: key, content: section?.content || {} });
@@ -158,7 +164,7 @@ export default function Contenu() {
         <div>
           <h1 className="text-display text-on-surface dark:text-[#e4e4ef] font-bold">Contenu du site</h1>
           <p className="text-body-md text-on-surface-variant dark:text-[#8e90a2] mt-sm">
-            Modifiez les textes et contenus affichés sur le site vitrine
+            Mettez à jour le contenu du site vitrine directement depuis ce tableau de bord.
           </p>
         </div>
         <a
@@ -263,7 +269,7 @@ export default function Contenu() {
       </div>
 
       {/* Section Modal */}
-      {modalOpen && editingItem && editingItem.type === "text" && (
+      {modalOpen && modalType === "section" && (
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={`Modifier ${SITE_SECTIONS.find(s => s.key === selectedSection)?.label || selectedSection}`}>
           <form onSubmit={handleTextSubmit} className="space-y-md pb-lg">
             {selectedSection === "hero" && (
@@ -453,7 +459,7 @@ export default function Contenu() {
       )}
 
       {/* Service Modal */}
-      {modalOpen && editingItem && editingItem.type === "service" && (
+      {modalOpen && modalType === "service" && (
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingItem ? "Modifier le service" : "Nouveau service"}>
           <form onSubmit={handleServiceSubmit} className="space-y-md pb-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
