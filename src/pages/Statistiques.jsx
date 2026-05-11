@@ -82,10 +82,6 @@ export default function Statistiques() {
     { label: "Revenus Total", value: stats.revenue ?? "...", change: "", icon: "attach_money", color: "text-tertiary" },
     { label: "Taux Conversion", value: stats.conversion ?? "...", change: "", icon: "trending_up", color: "text-primary" },
   ];
-    { label: "Devis Ce Mois", value: stats.pendingQuotes ?? "...", change: "", icon: "description", color: "text-secondary" },
-    { label: "Devis Acceptés", value: stats.acceptedQuotes ?? "...", change: "", icon: "check_circle", color: "text-success" },
-    { label: "Taux Conversion", value: stats.conversionRate ? `${stats.conversionRate}%` : "...", change: "", icon: "trending_up", color: "text-primary" },
-  ];
 
   return (
     <div className="space-y-lg p-lg">
