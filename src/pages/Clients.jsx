@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 
 // ── Types & constants ─────────────────────────────────────────────
 const STATUS_META = {
@@ -208,6 +209,7 @@ let nextId = 10;
 // ── Main page ─────────────────────────────────────────────────────
 export default function Clients() {
   const { clients, setClients, fetchClients, loading, error } = useApp();
+  const { token } = useAuth();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterService, setFilterService] = useState("all");
@@ -220,8 +222,9 @@ export default function Clients() {
   const [delTarget, setDelTarget] = useState(null);
 
   useEffect(() => {
+    if (!token) return;
     fetchClients();
-  }, [fetchClients]);
+  }, [token, fetchClients]);
 
   // ── Derived list ──────────────────────────────────────────────
   const filtered = useMemo(() => {

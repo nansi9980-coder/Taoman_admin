@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import clsx from "clsx";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 
 // ─── Placeholder data shapes (connect to your API) ─────────────────────────
 const INSCRIPTIONS_DATA = [
@@ -120,11 +121,13 @@ export default function Dashboard() {
   const [period, setPeriod] = useState("6m");
 
   const { dashboardStats, fetchDashboardStats, logs, fetchLogs, loading, error } = useApp();
+  const { token } = useAuth();
 
   useEffect(() => {
+    if (!token) return;
     fetchDashboardStats();
     fetchLogs();
-  }, [fetchDashboardStats, fetchLogs]);
+  }, [token, fetchDashboardStats, fetchLogs]);
 
   const RECENT_ACTIVITY = (logs || []).slice(0, 5).map(log => ({
     message: `${log.user} - ${log.action} (${log.resource})`,
