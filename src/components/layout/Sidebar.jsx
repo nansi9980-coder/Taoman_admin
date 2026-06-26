@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: "/devis", icon: "description", label: "Devis", permission: "devis" },
   { to: "/contenu", icon: "edit_note", label: "Contenu du site", permission: "content" },
   { to: "/medias", icon: "perm_media", label: "Médiathèque", permission: "content" },
+  { to: "/realisations", icon: "landscape", label: "Réalisations", permission: "content" },
   { to: "/jobs", icon: "work", label: "Emplois", permission: null },
   { to: "/messages", icon: "chat", label: "Contact", permission: null },
   { to: "/calendar", icon: "calendar_month", label: "Calendrier", permission: null },

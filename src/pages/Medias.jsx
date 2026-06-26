@@ -78,6 +78,7 @@ export default function Medias() {
             <option value="general">Général</option>
             <option value="documents">Documents</option>
             <option value="images">Images</option>
+            <option value="realisation">Réalisations terrain</option>
             <option value="contrats">Contrats</option>
           </select>
           <label className={clsx(

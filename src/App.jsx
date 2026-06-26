@@ -12,6 +12,7 @@ import Clients from "./pages/Clients";
 import Devis from "./pages/Devis";
 import Contenu from "./pages/Contenu";
 import Medias from "./pages/Medias";
+import Realisations from "./pages/Realisations";
 import Statistiques from "./pages/Statistiques";
 import Rapports from "./pages/Rapports";
 import Logs from "./pages/Logs";
@@ -52,6 +53,7 @@ function AdminLayout() {
             <Route path="/devis/*" element={<Devis />} />
             <Route path="/contenu/*" element={<Contenu />} />
             <Route path="/medias" element={<Medias />} />
+            <Route path="/realisations" element={<Realisations />} />
             <Route path="/statistiques" element={<Statistiques />} />
             <Route path="/rapports" element={<Rapports />} />
             <Route path="/logs" element={<Logs />} />
