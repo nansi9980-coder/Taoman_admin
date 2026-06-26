@@ -26,24 +26,14 @@ export default function Realisations() {
   });
   const [mediaList, setMediaList] = useState([]);
   const [showMediaSelector, setShowMediaSelector] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const loadRealisations = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/content/texts/realisations', { token });
-      console.log('Realisations response:', response);
-      
-      if (response?.content) {
-        let items = response.content;
-        if (typeof items === 'string') {
-          items = JSON.parse(items);
-        }
-        const realList = items?.items || [];
-        console.log('Loaded realisations:', realList);
-        setRealisations(realList);
-      } else {
-        setRealisations([]);
-      }
+      const response = await apiFetch('/realisations', { token });
+      console.log('Realisations from API:', response);
+      setRealisations(Array.isArray(response) ? response : []);
     } catch (e) {
       console.error('Erreur lors du chargement des réalisations:', e);
       setRealisations([]);
@@ -57,7 +47,7 @@ export default function Realisations() {
       const data = await apiFetch('/media', { token });
       if (Array.isArray(data)) {
         const realisationImages = data.filter(m => m.category === 'realisation');
-        console.log('Media images:', realisationImages);
+        console.log('Media images found:', realisationImages.length);
         setMediaList(realisationImages);
       }
     } catch (e) {
@@ -71,6 +61,34 @@ export default function Realisations() {
       loadMedia();
     }
   }, [token]);
+
+  const handleSync = async () => {
+    try {
+      setSyncing(true);
+      // Créer les réalisations depuis les images
+      const newRealisations = mediaList.map((media, idx) => ({
+        id: media.id || `real-${idx}`,
+        title: media.name || `Réalisation ${idx + 1}`,
+        category: 'Agro Business',
+        progress: 70,
+        imageUrl: media.url,
+      }));
+
+      await apiFetch('/realisations/sync', {
+        method: 'POST',
+        token,
+        body: JSON.stringify({ items: newRealisations }),
+      });
+
+      alert('Images synchronisées avec succès!');
+      await loadRealisations();
+    } catch (e) {
+      console.error('Erreur lors de la synchronisation:', e);
+      alert('Erreur: ' + e.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const handleEdit = (idx) => {
     const realisation = realisations[idx];
@@ -89,17 +107,10 @@ export default function Realisations() {
         idx === editingIdx ? { ...item, ...formData } : item
       );
       
-      const payload = {
-        section: 'realisations',
-        content: { items: updatedItems },
-      };
-      
-      console.log('Saving payload:', payload);
-      
-      await apiFetch('/content/texts', {
+      await apiFetch('/realisations/update', {
         method: 'POST',
         token,
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ items: updatedItems }),
       });
       
       setEditingIdx(null);
@@ -131,6 +142,21 @@ export default function Realisations() {
             Gérez les réalisations, les catégories et les images du carrousel.
           </p>
         </div>
+        {mediaList.length > 0 && (
+          <button
+            onClick={handleSync}
+            disabled={syncing || realisations.length > 0}
+            className={`px-6 py-3 rounded-lg font-bold transition-colors ${
+              syncing
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : realisations.length > 0
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-primary text-white hover:bg-primary-container'
+            }`}
+          >
+            {syncing ? '⏳ Synchronisation...' : realisations.length > 0 ? '✓ Synchronisé' : '⇅ Synchroniser les images'}
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -146,7 +172,9 @@ export default function Realisations() {
               </span>
               <p className="text-body-md text-on-surface-variant dark:text-[#8e90a2]">Aucune réalisation disponible</p>
               <p className="text-label-md text-on-surface-variant dark:text-[#8e90a2] mt-sm">
-                Les réalisations s'affichent après avoir ajouté des images dans la Médiathèque avec la catégorie "Réalisations terrain"
+                {mediaList.length > 0 
+                  ? 'Cliquez sur "Synchroniser les images" pour importer les réalisations de la Médiathèque'
+                  : 'Téléchargez d\'abord des images dans la Médiathèque avec la catégorie "Réalisations terrain"'}
               </p>
             </div>
           ) : (
