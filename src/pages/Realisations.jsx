@@ -90,6 +90,16 @@ export default function Realisations() {
     }
   };
 
+  const handleAdd = () => {
+    setEditingIdx(-1); // -1 signifie nouvelle réalisation
+    setFormData({
+      title: '',
+      category: '',
+      progress: 70,
+      imageUrl: '',
+    });
+  };
+
   const handleEdit = (idx) => {
     const realisation = realisations[idx];
     setEditingIdx(idx);
@@ -103,9 +113,21 @@ export default function Realisations() {
 
   const handleSave = async () => {
     try {
-      const updatedItems = realisations.map((item, idx) => 
-        idx === editingIdx ? { ...item, ...formData } : item
-      );
+      let updatedItems;
+      
+      if (editingIdx === -1) {
+        // Créer une nouvelle réalisation
+        const newItem = {
+          id: `real-${Date.now()}`,
+          ...formData,
+        };
+        updatedItems = [...realisations, newItem];
+      } else {
+        // Mettre à jour une réalisation existante
+        updatedItems = realisations.map((item, idx) => 
+          idx === editingIdx ? { ...item, ...formData } : item
+        );
+      }
       
       await apiFetch('/realisations/update', {
         method: 'POST',
@@ -142,12 +164,21 @@ export default function Realisations() {
             Gérez les réalisations, les catégories et les images du carrousel.
           </p>
         </div>
-        {mediaList.length > 0 && (
-          <button
-            onClick={handleSync}
-            disabled={syncing || realisations.length > 0}
-            className={`px-6 py-3 rounded-lg font-bold transition-colors ${
-              syncing
+        <div className="flex gap-md flex-wrap">
+          {editingIdx === null && (
+            <button
+              onClick={handleAdd}
+              className="px-6 py-3 rounded-lg font-bold bg-primary text-white hover:bg-primary-container transition-colors"
+            >
+              + Ajouter une réalisation
+            </button>
+          )}
+          {mediaList.length > 0 && (
+            <button
+              onClick={handleSync}
+              disabled={syncing || realisations.length > 0}
+              className={`px-6 py-3 rounded-lg font-bold transition-colors ${
+                syncing
                 ? 'bg-gray-400 text-white cursor-not-allowed'
                 : realisations.length > 0
                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
