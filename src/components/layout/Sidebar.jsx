@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: "/calendar", icon: "calendar_month", label: "Calendrier", permission: null },
   { to: "/investments", icon: "trending_up", label: "Investissements", permission: null },
   { to: "/backup", icon: "backup", label: "Sauvegarde", permission: null },
+  { to: "/debug", icon: "bug_report", label: "Debug", permission: null },
   { to: "/statistiques", icon: "bar_chart", label: "Statistiques", permission: "reports" },
   { to: "/rapports", icon: "summarize", label: "Rapports", permission: "reports" },
   { to: "/logs", icon: "history", label: "Journaux d'activité", permission: "logs" },
